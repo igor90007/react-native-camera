@@ -450,17 +450,13 @@ class Camera1 extends CameraViewImpl implements MediaRecorder.OnInfoListener,
         if (!mIsPreviewActive) {
             throw new IllegalStateException("Preview is paused - resume it before taking a picture.");
         }
-        if (getAutoFocus()) {
-            mCamera.cancelAutoFocus();
-            mCamera.autoFocus(new Camera.AutoFocusCallback() {
-                @Override
-                public void onAutoFocus(boolean success, Camera camera) {
-                    takePictureInternal(options);
-                }
-            });
-        } else {
-            takePictureInternal(options);
-        }
+      
+        // UPDATE: Take picture right away instead of requesting/waiting for focus.
+        // This will match closer what the native camera does,
+        // and will capture whatever is on the preview without changing the camera focus.
+        // This change will also help with autoFocusPointOfInterest not being usable to capture (Issue #2420)
+        // and with takePicture never returning/resolving if the focus was reset (Issue #2421)
+        takePictureInternal(options);
     }
 
     int orientationEnumToRotation(int orientation) {
