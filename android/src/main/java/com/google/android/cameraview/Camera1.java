@@ -508,7 +508,10 @@ class Camera1 extends CameraViewImpl implements MediaRecorder.OnInfoListener,
                 @Override
                 public void onPictureTaken(byte[] data, Camera camera) {
                     isPictureCaptureInProgress.set(false);
-                    camera.cancelAutoFocus();
+                    
+                    // this shouldn't be needed and messes up autoFocusPointOfInterest
+                    // camera.cancelAutoFocus();
+                  
                     if (options.hasKey("pauseAfterCapture") && !options.getBoolean("pauseAfterCapture")) {
                         camera.startPreview();
                         mIsPreviewActive = true;
@@ -771,6 +774,7 @@ class Camera1 extends CameraViewImpl implements MediaRecorder.OnInfoListener,
 
             List<Camera.Area> meteringAreas = new ArrayList<>();
             meteringAreas.add(new Camera.Area(rect, FOCUS_METERING_AREA_WEIGHT_DEFAULT));
+          
             if (parameters.getMaxNumFocusAreas() != 0 && focusMode != null &&
                     (focusMode.equals(Camera.Parameters.FOCUS_MODE_AUTO) ||
                             focusMode.equals(Camera.Parameters.FOCUS_MODE_MACRO) ||
@@ -791,12 +795,18 @@ class Camera1 extends CameraViewImpl implements MediaRecorder.OnInfoListener,
                 catch(RuntimeException e ) {
                   Log.e("CAMERA_1::", "setParameters failed", e);
                 }
-                mCamera.autoFocus(new Camera.AutoFocusCallback() {
-                    @Override
-                    public void onAutoFocus(boolean success, Camera camera) {
-                        resetFocus(success, camera);
-                    }
-                });
+                
+                try{
+                    mCamera.autoFocus(new Camera.AutoFocusCallback() {
+                        @Override
+                        public void onAutoFocus(boolean success, Camera camera) {
+                            //resetFocus(success, camera);
+                        }
+                    });
+                }
+                catch(RuntimeException e ) {
+                  Log.e("CAMERA_1::", "autoFocus failed", e);
+                }
             } else if (parameters.getMaxNumMeteringAreas() > 0) {
                 if (!parameters.getSupportedFocusModes().contains(Camera.Parameters.FOCUS_MODE_AUTO)) {
                     return; //cannot autoFocus
