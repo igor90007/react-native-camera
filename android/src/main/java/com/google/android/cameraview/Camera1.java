@@ -821,19 +821,30 @@ class Camera1 extends CameraViewImpl implements MediaRecorder.OnInfoListener,
                 catch(RuntimeException e ) {
                   Log.e("CAMERA_1::", "setParameters failed", e);
                 }
-                mCamera.autoFocus(new Camera.AutoFocusCallback() {
-                    @Override
-                    public void onAutoFocus(boolean success, Camera camera) {
-                        resetFocus(success, camera);
-                    }
-                });
+                
+                try{
+                    mCamera.autoFocus(new Camera.AutoFocusCallback() {
+                        @Override
+                        public void onAutoFocus(boolean success, Camera camera) {
+                            //resetFocus(success, camera);
+                        }
+                    });
+                }
+                catch(RuntimeException e ) {
+                  Log.e("CAMERA_1::", "autoFocus failed", e);
+                }
             } else {
-                mCamera.autoFocus(new Camera.AutoFocusCallback() {
-                    @Override
-                    public void onAutoFocus(boolean success, Camera camera) {
-                        mCamera.cancelAutoFocus();
-                    }
-                });
+                try{
+                    mCamera.autoFocus(new Camera.AutoFocusCallback() {
+                        @Override
+                        public void onAutoFocus(boolean success, Camera camera) {
+                            //mCamera.cancelAutoFocus();
+                        }
+                    });
+                }
+                catch(RuntimeException e ) {
+                  Log.e("CAMERA_1::", "autoFocus failed", e);
+                }
             }
         }
     }
